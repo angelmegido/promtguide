@@ -1,325 +1,694 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mantenimiento | Windar Renovables</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Patrones de Prompts Eficaces</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Ocultar barra de desplazamiento pero permitir scroll */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        /* Transición suave para el acordeón */
+        .accordion-content {
+            transition: grid-template-rows 0.3s ease-out;
+        }
+        
+        /* Clases de utilidad para coloreado semántico en modo oscuro (Ejemplos) */
+        .hl-role { color: #60a5fa; font-weight: bold; } /* Blue-400 */
+        .hl-obj { color: #fbbf24; font-weight: bold; }  /* Amber-400 */
+        .hl-ctx { color: #34d399; font-weight: bold; }  /* Emerald-400 */
+        .hl-res { color: #fb7185; font-weight: bold; }  /* Rose-400 */
+        .hl-fmt { color: #c084fc; font-weight: bold; }  /* Purple-400 */
+        .hl-step { color: #fb923c; font-weight: bold; } /* Orange-400 */
+        .hl-data { color: #22d3ee; font-weight: bold; } /* Cyan-400 */
 
-  <!-- Tailwind (CDN) -->
-  <script src="https://cdn.tailwindcss.com"></script>
+        /* Clases de utilidad para coloreado semántico en modo claro (Estructura) */
+        .st-role { color: #2563eb; font-weight: 800; } /* Blue-600 */
+        .st-obj { color: #d97706; font-weight: 800; }  /* Amber-600 */
+        .st-ctx { color: #059669; font-weight: 800; }  /* Emerald-600 */
+        .st-res { color: #e11d48; font-weight: 800; }  /* Rose-600 */
+        .st-fmt { color: #9333ea; font-weight: 800; }  /* Purple-600 */
+        .st-step { color: #ea580c; font-weight: 800; } /* Orange-600 */
+        .st-data { color: #0891b2; font-weight: 800; } /* Cyan-600 */
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
-
-  <style>
-    :root{
-      --primary: #4298b5;
-      --black: #000000;
-      --white: #ffffff;
-    }
-
-    body{
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      overflow: hidden;
-      background: var(--black);
-      color: var(--white);
-    }
-
-    h1{ font-family: 'Outfit', sans-serif; }
-
-    .gradient-text{
-      background: linear-gradient(90deg, var(--primary), #ffffff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    #root{ width: 100vw; height: 100vh; }
-
-    .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
-  </style>
+    </style>
 </head>
+<body class="bg-slate-100 text-slate-800 min-h-screen">
 
-<body>
-  <div id="root"></div>
+    <div class="max-w-[1600px] mx-auto p-4 md:p-8">
+        
+        <!-- Main Title -->
+        <header class="mb-8 text-center md:text-left">
+            <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tight">Patrones de Prompt</h1>
+        </header>
 
-  <script type="module">
-    import React, { useEffect, useMemo, useState } from "https://esm.sh/react@19.2.4";
-    import { createRoot } from "https://esm.sh/react-dom@19.2.4/client";
-    import { AnimatePresence, motion } from "https://esm.sh/framer-motion@12.29.2";
-    import htm from "https://esm.sh/htm@3.1.1";
-    const html = htm.bind(React.createElement);
+        <!-- Layout Container -->
+        <div class="flex flex-col gap-6 items-start">
+            
+            <!-- Universal Structure Sidebar (Always Visible / Sticky) -->
+            <!-- Note: On mobile/tablet this could be hidden or accordion if needed, currently kept visible as requested -->
+            <div class="w-full flex flex-col lg:flex-row gap-6 items-start relative">
 
-    // --- ASSETS ---
-    const BG_IMAGE = "https://windar-renovables.com/wp-content/uploads/2021/08/Ecosistemas_Windar-1-scaled.jpg";
-    const LOGO_IMAGE = "https://windar-renovables.com/wp-content/uploads/2021/07/cropped-Mesa-de-trabajo-1.png";
+                <aside class="w-full lg:w-72 flex-shrink-0 lg:sticky lg:top-8 z-10 self-start">
+                    <div class="bg-slate-900 text-slate-300 rounded-2xl p-6 shadow-xl border border-slate-800 overflow-hidden relative">
+                        <!-- Decorative background element -->
+                        <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-600 rounded-full opacity-20 blur-2xl"></div>
+                        
+                        <h2 class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-6 flex items-center gap-2 border-b border-slate-800 pb-4">
+                            <i data-lucide="layers" class="w-4 h-4"></i>
+                            Estructura Universal
+                        </h2>
+                        
+                        <!-- Legend removed as requested -->
 
-    // --- TRANSLATIONS ---
-    const TRANSLATIONS = [
-      {
-        lang: "es",
-        badge: "EN MANTENIMIENTO",
-        title: "Trabajos en curso",
-        desc: "Estamos realizando mantenimiento preventivo para mejorar el rendimiento de nuestros servicios digitales. Volvemos en breve.",
-        status: "Sincronizando sistemas...",
-      },
-      {
-        lang: "en",
-        badge: "UNDER MAINTENANCE",
-        title: "Work in progress",
-        desc: "We are performing preventive maintenance to improve our digital services. We'll be back shortly.",
-        status: "Synchronizing systems...",
-      },
-    ];
+                        <ul class="space-y-4" id="universal-list">
+                            <!-- Item 1: Objetivo -->
+                            <li class="group cursor-pointer" onclick="toggleAccordion(this)">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3 text-white font-bold text-sm group-hover:text-blue-300 transition-colors">
+                                        <i data-lucide="target" class="w-4 h-4 text-amber-500"></i>
+                                        Objetivo
+                                    </div>
+                                    <i data-lucide="chevron-down" class="w-3 h-3 text-slate-500 transition-transform duration-300 accordion-icon"></i>
+                                </div>
+                                <div class="grid grid-rows-[0fr] accordion-content">
+                                    <div class="overflow-hidden">
+                                        <p class="text-xs text-slate-400 mt-2 leading-relaxed pl-7 border-l border-slate-700 ml-2">
+                                            Define claramente la tarea usando un verbo de acción (ej. "Resume", "Analiza", "Genera"). Es el "qué" quieres lograr.
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
 
-    // --- WIND TURBINE (subtil, en blanco) ---
-    const WindTurbine = ({ className = "", scale = 1, delay = 0 }) => html`
-      <div className=${`relative ${className}`} style=${{ transform: `scale(${scale})` }}>
-        <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-2 h-48 bg-white/10 rounded-t-full"></div>
-        <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2">
-          <${motion.div}
-            animate=${{ rotate: 360 }}
-            transition=${{ duration: 12, repeat: Infinity, ease: "linear", delay }}
-            className="relative w-4 h-4 bg-white/20 rounded-full flex items-center justify-center"
-          >
-            ${[0, 120, 240].map((deg) => html`
-              <div
-                key=${deg}
-                className="absolute w-1 h-32 bg-gradient-to-t from-white/15 to-transparent rounded-full origin-bottom"
-                style=${{ transform: `rotate(${deg}deg) translateY(-100%)` }}
-              ></div>
-            `)}
-          </${motion.div}>
-        </div>
-      </div>
-    `;
+                            <!-- Item 2: Contexto -->
+                            <li class="group cursor-pointer" onclick="toggleAccordion(this)">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3 text-white font-bold text-sm group-hover:text-blue-300 transition-colors">
+                                        <i data-lucide="map-pin" class="w-4 h-4 text-emerald-500"></i>
+                                        Contexto
+                                    </div>
+                                    <i data-lucide="chevron-down" class="w-3 h-3 text-slate-500 transition-transform duration-300 accordion-icon"></i>
+                                </div>
+                                <div class="grid grid-rows-[0fr] accordion-content">
+                                    <div class="overflow-hidden">
+                                        <p class="text-xs text-slate-400 mt-2 leading-relaxed pl-7 border-l border-slate-700 ml-2">
+                                            ¿Quién eres? ¿A quién te diriges? ¿Cuál es la situación de fondo? Ayuda a la IA a aterrizar la respuesta.
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
 
-    // --- LOGO (IMG real) ---
-    const BrandHeader = () => html`
-      <div className="flex flex-col items-center gap-4">
-        <img
-          src=${LOGO_IMAGE}
-          alt="Windar Renovables"
-          className="h-14 md:h-16 w-auto drop-shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
-          loading="eager"
-          decoding="async"
-        />
-        <span className="sr-only">Windar Renovables</span>
-      </div>
-    `;
+                            <!-- Item 3: Expectativas -->
+                            <li class="group cursor-pointer" onclick="toggleAccordion(this)">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3 text-white font-bold text-sm group-hover:text-blue-300 transition-colors">
+                                        <i data-lucide="settings-2" class="w-4 h-4 text-purple-500"></i>
+                                        Expectativas
+                                    </div>
+                                    <i data-lucide="chevron-down" class="w-3 h-3 text-slate-500 transition-transform duration-300 accordion-icon"></i>
+                                </div>
+                                <span class="text-[10px] text-slate-500 pl-7 block mt-0.5 group-hover:text-slate-400 transition-colors">Tono, formato, estilo</span>
+                                <div class="grid grid-rows-[0fr] accordion-content">
+                                    <div class="overflow-hidden">
+                                        <p class="text-xs text-slate-400 mt-2 leading-relaxed pl-7 border-l border-slate-700 ml-2">
+                                            Especifica el formato de salida (JSON, Tabla, Lista) y el tono de voz (Formal, Humorístico, Académico).
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
 
-    // --- RELOJES (arriba derecha, vertical, sin segundos) ---
-    const WorldClocks = () => {
-      const ZONES = [
-        { label: "España", tz: "Europe/Madrid" },
-        { label: "India", tz: "Asia/Kolkata" },
-        { label: "Brasil", tz: "America/Sao_Paulo" },
-        { label: "México", tz: "America/Mexico_City" },
-        { label: "Polonia", tz: "Europe/Warsaw" },
-      ];
+                            <!-- Item 4: Fuente / Datos -->
+                            <li class="group cursor-pointer" onclick="toggleAccordion(this)">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3 text-white font-bold text-sm group-hover:text-blue-300 transition-colors">
+                                        <i data-lucide="database" class="w-4 h-4 text-cyan-500"></i>
+                                        Fuente / Datos
+                                    </div>
+                                    <i data-lucide="chevron-down" class="w-3 h-3 text-slate-500 transition-transform duration-300 accordion-icon"></i>
+                                </div>
+                                <div class="grid grid-rows-[0fr] accordion-content">
+                                    <div class="overflow-hidden">
+                                        <p class="text-xs text-slate-400 mt-2 leading-relaxed pl-7 border-l border-slate-700 ml-2">
+                                            Proporciona el texto base, el código o los datos crudos que la IA debe procesar o usar como referencia.
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
 
-      const [now, setNow] = useState(new Date());
+                            <!-- Item 5: Restricciones -->
+                            <li class="group cursor-pointer" onclick="toggleAccordion(this)">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3 text-white font-bold text-sm group-hover:text-blue-300 transition-colors">
+                                        <i data-lucide="alert-octagon" class="w-4 h-4 text-rose-500"></i>
+                                        Restricciones
+                                    </div>
+                                    <i data-lucide="chevron-down" class="w-3 h-3 text-slate-500 transition-transform duration-300 accordion-icon"></i>
+                                </div>
+                                <span class="text-[10px] text-slate-500 pl-7 block mt-0.5 group-hover:text-slate-400 transition-colors">Límites, qué no hacer</span>
+                                <div class="grid grid-rows-[0fr] accordion-content">
+                                    <div class="overflow-hidden">
+                                        <p class="text-xs text-slate-400 mt-2 leading-relaxed pl-7 border-l border-slate-700 ml-2">
+                                            Define límites de longitud, temas prohibidos o sesgos a evitar (ej. "No uses jerga técnica", "Máx 50 palabras").
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
 
-      useEffect(() => {
-        const t = setInterval(() => setNow(new Date()), 15000); // cada 15s, suficiente sin segundos
-        return () => clearInterval(t);
-      }, []);
+                            <!-- Item 6: Ejemplos -->
+                            <li class="group cursor-pointer" onclick="toggleAccordion(this)">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3 text-white font-bold text-sm group-hover:text-blue-300 transition-colors">
+                                        <i data-lucide="copy-plus" class="w-4 h-4 text-blue-500"></i>
+                                        Ejemplos
+                                    </div>
+                                    <i data-lucide="chevron-down" class="w-3 h-3 text-slate-500 transition-transform duration-300 accordion-icon"></i>
+                                </div>
+                                <span class="text-[10px] text-slate-500 pl-7 block mt-0.5 group-hover:text-slate-400 transition-colors">Few-shot prompting</span>
+                                <div class="grid grid-rows-[0fr] accordion-content">
+                                    <div class="overflow-hidden">
+                                        <p class="text-xs text-slate-400 mt-2 leading-relaxed pl-7 border-l border-slate-700 ml-2">
+                                            Muestra a la IA exactamente qué quieres dándole ejemplos de "Input -> Output" deseado (Few-Shot).
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
 
-      const fmtTime = (tz) =>
-        new Intl.DateTimeFormat("es-ES", {
-          timeZone: tz,
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        }).format(now);
+                            <!-- Item 7: Criterio de éxito -->
+                            <li class="group cursor-pointer" onclick="toggleAccordion(this)">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3 text-white font-bold text-sm group-hover:text-blue-300 transition-colors">
+                                        <i data-lucide="flag-triangle-right" class="w-4 h-4 text-orange-500"></i>
+                                        Criterio de éxito
+                                    </div>
+                                    <i data-lucide="chevron-down" class="w-3 h-3 text-slate-500 transition-transform duration-300 accordion-icon"></i>
+                                </div>
+                                <div class="grid grid-rows-[0fr] accordion-content">
+                                    <div class="overflow-hidden">
+                                        <p class="text-xs text-slate-400 mt-2 leading-relaxed pl-7 border-l border-slate-700 ml-2">
+                                            ¿Cómo sabrás si la respuesta es buena? Define métricas o puntos clave que debe cumplir el resultado.
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
 
-      return html`
-        <div className="absolute top-6 right-6 z-20 pointer-events-none">
-          <div className="rounded-2xl border border-white/15 bg-white/5 backdrop-blur-md p-3 md:p-4 w-[170px] md:w-[190px]">
-            <div className="text-[10px] md:text-[11px] font-extrabold uppercase tracking-[0.25em] text-white/80 mb-2">
-              Horas/Time
+                        <div class="mt-8 pt-4 border-t border-slate-800 text-center">
+                            <span class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">Interactúa para ver detalles</span>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Main Content Area Wrapper -->
+                <main class="flex-1 w-full space-y-6 min-w-0">
+                    
+                    <!-- Header Navigation (Tabs) -->
+                    <div class="w-full overflow-x-auto pb-2 scrollbar-hide">
+                        <div class="flex space-x-2 md:space-x-4 min-w-max" id="tabs-container">
+                            <!-- Los tabs se generarán aquí con JS -->
+                        </div>
+                    </div>
+
+                    <!-- Main Content Layout (List + Detail) -->
+                    <div class="flex flex-col lg:flex-row gap-6">
+                        
+                        <!-- Middle Column (Pattern List) -->
+                        <div class="w-full lg:w-1/3 space-y-4">
+                            <div class="flex items-center space-x-2 mb-2 px-1">
+                                <i id="category-icon" class="text-slate-500 w-5 h-5"></i>
+                                <h2 id="category-title" class="text-lg font-bold text-slate-800"></h2>
+                            </div>
+                            
+                            <div id="patterns-list" class="space-y-3">
+                                <!-- La lista de patrones se generará aquí con JS -->
+                            </div>
+                        </div>
+
+                        <!-- Right Column (Detail View) -->
+                        <div class="w-full lg:w-2/3">
+                            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8 h-full flex flex-col sticky top-8">
+                                
+                                <!-- Badge -->
+                                <div>
+                                    <div class="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 text-slate-600 text-xs font-bold tracking-wide uppercase mb-4">
+                                        Patrón Seleccionado
+                                    </div>
+                                </div>
+
+                                <!-- Title -->
+                                <h1 id="detail-title" class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-6 leading-tight"></h1>
+
+                                <!-- Definition Box -->
+                                <div class="bg-blue-50/50 border-l-4 border-blue-500 p-5 rounded-r-lg mb-8">
+                                    <h4 class="text-xs font-bold text-blue-600 uppercase mb-2 tracking-wider">Definición</h4>
+                                    <p id="detail-definition" class="text-blue-900 text-lg leading-relaxed"></p>
+                                </div>
+
+                                <!-- Structure & Tips Grid -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                    <!-- Structure -->
+                                    <div>
+                                        <div class="flex items-center space-x-2 text-purple-600 mb-3">
+                                            <i data-lucide="network" class="w-4 h-4"></i>
+                                            <h4 class="font-bold text-sm">Estructura</h4>
+                                        </div>
+                                        <div id="detail-structure" class="bg-slate-50 border border-slate-200 rounded-lg p-4 font-mono text-sm text-slate-700 shadow-sm leading-relaxed"></div>
+                                    </div>
+
+                                    <!-- Pro Tip -->
+                                    <div>
+                                        <div class="flex items-center space-x-2 text-amber-600 mb-3">
+                                            <i data-lucide="lightbulb" class="w-4 h-4"></i>
+                                            <h4 class="font-bold text-sm">Consejo Pro</h4>
+                                        </div>
+                                        <p id="detail-tip" class="text-slate-600 text-sm leading-relaxed"></p>
+                                    </div>
+                                </div>
+
+                                <!-- Practical Example Box -->
+                                <div class="mt-auto">
+                                    <div class="flex items-center justify-between mb-3 text-slate-500">
+                                        <span class="text-xs font-bold uppercase tracking-wider">Ejemplo Práctico</span>
+                                        <button onclick="copyToClipboard()" class="flex items-center space-x-1 text-xs hover:text-blue-600 transition-colors cursor-pointer group">
+                                            <i data-lucide="copy" class="w-3 h-3 group-hover:text-blue-600"></i>
+                                            <span>Copiar</span>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="bg-slate-900 rounded-xl p-6 shadow-lg relative overflow-hidden group">
+                                        <div class="absolute top-0 right-0 p-4 opacity-10">
+                                            <i data-lucide="check-circle-2" class="text-white w-24 h-24"></i>
+                                        </div>
+                                        <code id="detail-example" class="relative z-10 font-mono text-blue-100 text-base md:text-lg leading-relaxed block whitespace-pre-wrap"></code>
+                                    </div>
+                                    <!-- Toast Notification (Hidden by default) -->
+                                    <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 text-white px-4 py-2 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50 text-sm">
+                                        ¡Copiado al portapapeles!
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </main>
+
             </div>
-
-            <div className="flex flex-col gap-2">
-              ${ZONES.map((z) => html`
-                <div key=${z.tz} className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/25 px-3 py-2">
-                  <div className="text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-white/65">
-                    ${z.label}
-                  </div>
-                  <div className="text-sm md:text-base font-extrabold text-white tabular-nums">
-                    ${fmtTime(z.tz)}
-                  </div>
-                </div>
-              `)}
-            </div>
-          </div>
         </div>
-      `;
-    };
+    </div>
 
-    function App(){
-      const [idx, setIdx] = useState(0);
+    <script>
+        // --- DATA ---
+        // COLORS MAP:
+        // Role/Blue, Obj/Amber, Context/Emerald, Restriction/Rose, Format/Purple, Steps/Orange, Data/Cyan
+        
+        const categories = [
+            { id: 'fundamentos', label: 'Fundamentos', icon: 'anchor' },
+            { id: 'estructura', label: 'Estructura', icon: 'layout-template' },
+            { id: 'razonamiento', label: 'Razonamiento', icon: 'brain' },
+            { id: 'control', label: 'Control y Validación', icon: 'shield-check' },
+            { id: 'salida', label: 'Salida y Formato', icon: 'file-output' },
+            { id: 'coordinacion', label: 'Coordinación', icon: 'network' },
+        ];
 
-      // ✅ PROGRESO LINEAL (no aleatorio), empieza en 70% y sube hasta 95%
-      const [progress, setProgress] = useState(70.0);
+        const patternsData = {
+            fundamentos: [
+                {
+                    id: 1,
+                    title: "1. Prompt Raíz (Root Prompt)",
+                    definition: "Es el punto de partida de cualquier conversación con la IA. Define el rol, el objetivo global y las reglas básicas del intercambio.",
+                    structure: "<span class='st-role'>Rol</span> + <span class='st-obj'>Objetivo</span> + <span class='hl-ctx'>Criterios</span> + <span class='st-fmt'>Formato</span>",
+                    example: '"<span class="hl-role">Actúa como periodista cultural</span> y <span class="hl-obj">redacta</span> <span class="hl-fmt">un artículo breve</span> <span class="hl-ctx">para jóvenes</span>."',
+                    tip: "Úsalo siempre al iniciar una sesión. Es la base sobre la que se construyen instrucciones más complejas."
+                },
+                {
+                    id: 2,
+                    title: "2. Contexto",
+                    definition: "Explica para qué se usará la respuesta, quién la recibirá y cuáles son los límites. Evita respuestas genéricas.",
+                    structure: "<span class='st-role'>Ámbito</span> + <span class='st-ctx'>Audiencia</span> + <span class='st-obj'>Objetivo</span> + <span class='st-res'>Restricciones</span>",
+                    example: '"<span class="hl-role">Proyecto educativo</span> <span class="hl-ctx">para adolescentes</span>, <span class="hl-fmt">tono motivador</span>, <span class="hl-res">máximo 200 palabras</span>."',
+                    tip: "Sin contexto, la IA tenderá a respuestas genéricas. Es vital para la relevancia."
+                },
+                {
+                    id: 3,
+                    title: "3. Acción",
+                    definition: "El núcleo de la instrucción. Describe qué debe hacer la IA con un verbo claro y un resultado esperado.",
+                    structure: "<span class='st-obj'>Verbo</span> + <span class='st-data'>Qué</span> + <span class='st-fmt'>Cómo</span> + <span class='st-ctx'>Para quién</span>",
+                    example: '"<span class="hl-obj">Genera</span> <span class="hl-data">una lista de ideas creativas</span> <span class="hl-fmt">para redes sociales</span> <span class="hl-ctx">de una ONG</span>."',
+                    tip: "Usa verbos de acción directa y evita ambigüedades como 'haz algo interesante'."
+                },
+                {
+                    id: 4,
+                    title: "4. Persona (Identidad)",
+                    definition: "Permite que la IA adopte un rol, tono o estilo específico para mayor coherencia en la voz narrativa.",
+                    structure: "<span class='st-role'>Nombre + Rasgos</span> + <span class='st-obj'>Objetivo</span> + <span class='st-fmt'>Tono/Estilo</span>",
+                    example: '"<span class="hl-role">Eres \'Catalina\', 68 años, periodista de cine</span>, <span class="hl-fmt">tono ácido y culto</span>. <span class="hl-obj">Escribe una sinopsis...</span>"',
+                    tip: "Útil en redacción, atención al cliente, storytelling o simulaciones."
+                }
+            ],
+            estructura: [
+                {
+                    id: 5,
+                    title: "1. Receta (Recipe Prompt)",
+                    definition: "Estructura procesos o métodos paso a paso. Es útil para manuales, guías operativas o procedimientos.",
+                    structure: "<span class='st-obj'>Resultado</span> + <span class='st-step'>Pasos</span> + <span class='st-data'>Insumos</span> + <span class='st-res'>Criterio de éxito</span>",
+                    example: '"<span class="hl-step">Expón en 6 pasos</span> <span class="hl-obj">cómo lanzar una newsletter</span>, incluyendo <span class="hl-data">herramientas y tiempos recomendados</span>."',
+                    tip: "Úsalo cuando necesites claridad y secuencia lógica para formación o tutoriales."
+                },
+                {
+                    id: 6,
+                    title: "2. Expansión del esquema",
+                    definition: "Permite desarrollar o ampliar apartados ya existentes, añadiendo ejemplos, métricas o subtópicos.",
+                    structure: "<span class='st-data'>Apartado a ampliar</span> + <span class='st-obj'>Instrucción de desarrollo</span>",
+                    example: '"<span class="hl-data">Amplía el punto 3 sobre adquisición de usuarios</span> <span class="hl-obj">con tácticas, métricas concretas y KPIs</span>."',
+                    tip: "Ideal cuando ya tienes una estructura base y necesitas profundizar en secciones específicas."
+                },
+                {
+                    id: 7,
+                    title: "3. Resumen",
+                    definition: "Condensa la información, adaptando la extensión y el enfoque según el público destinatario.",
+                    structure: "<span class='st-obj'>Instrucción</span> + <span class='st-res'>Límite</span> o <span class='st-ctx'>Propósito</span>",
+                    example: '"<span class="hl-obj">Resume este informe</span> <span class="hl-res">en 100 palabras</span> <span class="hl-ctx">para un directivo no técnico</span>."',
+                    tip: "Sirve para filtrar lo esencial y ajustar la extensión para informes ejecutivos."
+                },
+                {
+                    id: 8,
+                    title: "4. Cambio de estilo",
+                    definition: "Transforma un texto manteniendo su contenido, pero modificando tono, voz o registro (ej. académico a divulgativo).",
+                    structure: "<span class='st-obj'>Instrucción de reescritura</span> + <span class='st-fmt'>Tono deseado</span>",
+                    example: '"<span class="hl-obj">Reescribe este texto</span> <span class="hl-fmt">con tono inspirador tipo charla TED</span>."',
+                    tip: "Perfecto para reciclar contenido para diferentes audiencias sin perder el mensaje original."
+                }
+            ],
+            razonamiento: [
+                {
+                    id: 9,
+                    title: "1. Alternativas",
+                    definition: "Sirve para comparar distintas opciones antes de decidir. Se usa cuando hay varias formas de resolver un problema.",
+                    structure: "<span class='st-ctx'>Contexto</span> + <span class='st-obj'>N alternativas</span> + <span class='st-res'>Criterios</span> + <span class='st-fmt'>Recomendación</span>",
+                    example: '"<span class="hl-obj">Propón 3 estrategias de marketing</span> con <span class="hl-res">ventajas y riesgos</span>, y <span class="st-fmt">recomienda la más efectiva</span>."',
+                    tip: "Crucial para análisis estratégicos y toma de decisiones informada."
+                },
+                {
+                    id: 10,
+                    title: "2. Interacción invertida",
+                    definition: "Invierte el flujo: la IA te hace preguntas para entender mejor el objetivo antes de dar una solución.",
+                    structure: "<span class='st-step'>Pide N preguntas sobre X</span> -> <span class='st-obj'>Propón soluciones</span>",
+                    example: '"<span class="hl-step">Hazme 5 preguntas sobre mi negocio</span>, luego <span class="hl-obj">sugiere 3 estrategias de crecimiento</span>."',
+                    tip: "Ideal cuando no tienes claro qué pedir o necesitas explorar posibilidades."
+                },
+                {
+                    id: 11,
+                    title: "3. Razonamiento paso a paso",
+                    definition: "Obliga a la IA a pensar de forma estructurada, explicando su proceso lógico antes de la respuesta final.",
+                    structure: "<span class='st-step'>Desglosa en etapas</span> + <span class='st-res'>Justifica cada paso</span>",
+                    example: '"<span class="hl-step">Desglosa el proceso para elaborar un plan de formación</span>, <span class="st-res">explicando las decisiones de cada fase</span>."',
+                    tip: "Esencial para problemas complejos, cálculos o planificación lógica (Chain of Thought)."
+                },
+                {
+                    id: 12,
+                    title: "4. Descomposición de tareas",
+                    definition: "Divide una gran tarea compleja en subtareas manejables para mejorar la precisión y el control.",
+                    structure: "<span class='st-obj'>Divide tarea X en subtareas</span> + <span class='st-res'>Ordena por prioridad</span>",
+                    example: '"<span class="hl-obj">Divide el desarrollo de un curso online en fases</span> y <span class="st-res">detalla las subtareas de cada una</span>."',
+                    tip: "Muy útil para gestión de proyectos largos con múltiples entregables."
+                },
+                {
+                    id: 13,
+                    title: "5. Prompt incremental",
+                    definition: "Trabaja por niveles de detalle, comenzando con una visión general y refinando paso a paso.",
+                    structure: "<span class='st-obj'>Resumen general</span> -> <span class='st-step'>Desarrolla cada parte</span>",
+                    example: '"<span class="hl-obj">Primero resume la idea general del proyecto</span>, luego <span class="hl-step">desarrolla cada módulo</span>."',
+                    tip: "Permite controlar la profundidad y corregir el rumbo sobre la marcha."
+                },
+                {
+                    id: 14,
+                    title: "6. Socrático",
+                    definition: "Estructura la conversación como una serie de preguntas guiadas para fomentar la reflexión.",
+                    structure: "<span class='st-step'>Plantea preguntas</span> <span class='st-obj'>para entender el objetivo</span>",
+                    example: '"<span class="hl-step">Hazme 3 preguntas</span> que ME permitan <span class="hl-obj">entender qué tipo de web quiero crear</span>."',
+                    tip: "Excelente para formación, mentoría o desbloqueo creativo."
+                }
+            ],
+            control: [
+                {
+                    id: 15,
+                    title: "1. Restrictivo",
+                    definition: "Limita explícitamente lo que la IA puede o no puede hacer. Evita la invención de información.",
+                    structure: "<span class='st-obj'>Haz X</span>, pero <span class='st-res'>sin Y</span> / <span class='st-res'>No hagas Z</span>",
+                    example: '"<span class="hl-res">No inventes datos.</span> <span class="hl-fmt">Si faltan, indícalo claramente.</span>"',
+                    tip: "Úsalo para tareas sensibles o informes técnicos donde la precisión es vital."
+                },
+                {
+                    id: 16,
+                    title: "2. Reflexivo",
+                    definition: "Hace que la IA revise su propia respuesta buscando errores antes de entregarla.",
+                    structure: "<span class='st-step'>Evalúa tu respuesta anterior</span> + <span class='st-obj'>Corrige errores</span>",
+                    example: '"<span class="hl-step">Revisa tu respuesta anterior</span> y <span class="hl-obj">mejora la claridad del argumento central</span>."',
+                    tip: "Mejora significativamente la fiabilidad de respuestas largas o analíticas."
+                },
+                {
+                    id: 17,
+                    title: "3. Crítica y revisión",
+                    definition: "Introduce un rol revisor que evalúa y reescribe la respuesta anterior.",
+                    structure: "<span class='st-role'>Actúa como revisor</span> + <span class='st-obj'>Mejora según criterios X</span>",
+                    example: '"<span class="hl-role">Actúa como editor</span> y <span class="hl-obj">mejora la claridad y fluidez</span> <span class="hl-data">del texto anterior</span>."',
+                    tip: "Muy útil para pulir textos sin tener que reescribirlos manualmente."
+                },
+                {
+                    id: 18,
+                    title: "4. Evaluador",
+                    definition: "Pide al modelo valorar su salida según criterios definidos (claridad, rigor, etc.).",
+                    structure: "<span class='st-obj'>Valora respuesta (0-5)</span> <span class='st-res'>según criterios X</span>",
+                    example: '"<span class="hl-obj">Evalúa tu respuesta</span> en <span class="hl-res">claridad, precisión y tono</span> <span class="hl-obj">(0-5)</span> y <span class="hl-step">explica las puntuaciones</span>."',
+                    tip: "Excelente para autoevaluación o benchmarking de calidad."
+                }
+            ],
+            salida: [
+                {
+                    id: 19,
+                    title: "1. Salida estructurada",
+                    definition: "Obliga a la IA a seguir una plantilla fija (JSON, Tabla, Lista). Indispensable para automatización.",
+                    structure: "<span class='st-obj'>Responde</span> en <span class='st-fmt'>formato X</span> con <span class='st-data'>claves Y</span>",
+                    example: '"<span class="hl-obj">Responde</span> en <span class="hl-fmt">formato JSON</span> con las claves: <span class="st-data">{\'objetivo\', \'acciones\', \'métricas\'}</span>."',
+                    tip: "Garantiza consistencia para integrar respuestas en bases de datos o excels."
+                },
+                {
+                    id: 20,
+                    title: "2. Potenciador (Power Prompt)",
+                    definition: "Pide al modelo optimizar un prompt existente para hacerlo más efectivo.",
+                    structure: "<span class='st-obj'>Optimiza este prompt</span> para <span class='st-res'>lograr X</span>",
+                    example: '"<span class="hl-obj">Optimiza este prompt</span> para <span class="hl-res">mayor claridad y precisión</span>."',
+                    tip: "Úsalo para mejorar tu propia ingeniería de prompts (metaprompting)."
+                },
+                {
+                    id: 21,
+                    title: "3. Few-Shot (Ejemplos)",
+                    definition: "Enseña al modelo cómo responder usando ejemplos correctos e incorrectos.",
+                    structure: "<span class='st-data'>Ejemplo correcto: A</span>. <span class='st-res'>Ejemplo erróneo: B</span>. -> <span class='st-obj'>Genera nuevo</span>.",
+                    example: '"<span class="hl-data">Ejemplo correcto: Redacción breve.</span> <span class="hl-res">Ejemplo erróneo: texto largo.</span> <span class="hl-obj">Crea una versión correcta.</span>"',
+                    tip: "La mejor forma de enseñar estilo y estructura específica."
+                }
+            ],
+            coordinacion: [
+                {
+                    id: 22,
+                    title: "1. Cambio de rol",
+                    definition: "Permite a la IA alternar entre distintos puntos de vista o especializaciones.",
+                    structure: "<span class='st-obj'>Responde</span> <span class='st-role'>como X</span>, luego <span class='hl-res'>como Y</span>",
+                    example: '"<span class="hl-obj">Responde primero</span> <span class="hl-role">como ingeniero de software</span>, luego <span class="hl-res">como divulgador científico</span>."',
+                    tip: "Obtén múltiples perspectivas sin consultar a varios expertos."
+                },
+                {
+                    id: 23,
+                    title: "2. Generador de prompts",
+                    definition: "Pide al modelo crear prompts eficaces para una tarea concreta.",
+                    structure: "<span class='st-obj'>Diseña un prompt eficaz</span> para <span class='st-res'>lograr X</span>",
+                    example: '"<span class="hl-obj">Diseña un prompt eficaz</span> para <span class="hl-res">enseñar gramática inglesa</span> <span class="hl-ctx">a estudiantes intermedios</span>."',
+                    tip: "Automatiza la creación de tus instrucciones."
+                },
+                {
+                    id: 24,
+                    title: "3. Bucle Crítico + Creador",
+                    definition: "Ciclo donde un rol genera y otro evalúa para garantizar calidad antes de la entrega.",
+                    structure: "<span class='st-role'>Modelo A</span> <span class='st-obj'>genera</span>; <span class='st-role'>Modelo B</span> <span class='st-step'>revisa y puntúa</span>",
+                    example: '"<span class="hl-role">Modelo A</span> <span class="hl-obj">redacta</span>; <span class="hl-role">Modelo B</span> <span class="hl-step">revisa, sugiere mejoras y da puntuación</span>."',
+                    tip: "Ideal para iteración y mejora constante de resultados complejos."
+                }
+            ]
+        };
 
-      useEffect(() => {
-        const interval = setInterval(() => setIdx((p) => (p + 1) % TRANSLATIONS.length), 4500);
-        return () => clearInterval(interval);
-      }, []);
+        // --- STATE ---
+        let activeTab = 'fundamentos';
+        let selectedPatternIndex = 0;
 
-      useEffect(() => {
-        const progInterval = setInterval(() => {
-          setProgress((p) => {
-            if (p >= 95.0) return 95.0;
-            // subida lineal suave: +0.05% cada 100ms => ~0.5%/s
-            const next = p + 0.05;
-            return next > 95.0 ? 95.0 : next;
-          });
-        }, 100);
-        return () => clearInterval(progInterval);
-      }, []);
+        // --- RENDER FUNCTIONS ---
+        
+        function renderTabs() {
+            const container = document.getElementById('tabs-container');
+            container.innerHTML = categories.map(cat => {
+                const isActive = activeTab === cat.id;
+                const activeClasses = 'bg-slate-900 text-white border-slate-900 shadow-md';
+                const inactiveClasses = 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300';
+                
+                return `
+                    <button onclick="switchTab('${cat.id}')" 
+                        class="flex items-center space-x-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 border cursor-pointer ${isActive ? activeClasses : inactiveClasses}">
+                        <i data-lucide="${cat.icon}" class="w-4 h-4"></i>
+                        <span>${cat.label}</span>
+                    </button>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
 
-      const current = useMemo(() => TRANSLATIONS[idx], [idx]);
-      const words = current.title.split(" ");
-      const lastTwoStart = Math.max(0, words.length - 2);
+        function renderSidebar() {
+            const listContainer = document.getElementById('patterns-list');
+            const catTitle = document.getElementById('category-title');
+            const catIcon = document.getElementById('category-icon');
+            
+            // Set Category Header
+            const currentCat = categories.find(c => c.id === activeTab);
+            catTitle.innerText = currentCat.label;
+            catIcon.setAttribute('data-lucide', currentCat.icon);
+            
+            const patterns = patternsData[activeTab];
 
-      return html`
-        <div className="relative w-full h-full overflow-hidden">
-          <!-- Background image -->
-          <div
-            className="absolute inset-0 bg-center bg-cover"
-            style=${{ backgroundImage: `url(${BG_IMAGE})` }}
-            aria-hidden="true"
-          ></div>
+            listContainer.innerHTML = patterns.map((pattern, index) => {
+                const isSelected = index === selectedPatternIndex;
+                const containerClasses = isSelected 
+                    ? 'bg-blue-50/50 border-blue-500 shadow-sm ring-1 ring-blue-500/20' 
+                    : 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-sm';
+                const titleClasses = isSelected ? 'text-blue-900' : 'text-slate-700';
+                const descClasses = isSelected ? 'text-blue-700' : 'text-slate-500';
+                
+                return `
+                    <div onclick="selectPattern(${index})" 
+                        class="p-4 rounded-xl border transition-all duration-200 cursor-pointer group relative overflow-hidden ${containerClasses}">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-semibold text-sm md:text-base pr-4 ${titleClasses}">
+                                ${pattern.title}
+                            </h3>
+                            ${isSelected ? '<div class="absolute right-0 top-0 bottom-0 w-1.5 bg-blue-500"></div>' : ''}
+                        </div>
+                        <p class="text-xs mt-2 line-clamp-2 ${descClasses}">
+                            ${pattern.definition}
+                        </p>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
 
-          <!-- Dark overlay + primary tint -->
-          <div className="absolute inset-0 bg-black/70" aria-hidden="true"></div>
-          <div className="absolute inset-0" style=${{
-            background: "radial-gradient(80% 60% at 50% 30%, rgba(66,152,181,0.35), rgba(0,0,0,0) 60%)"
-          }} aria-hidden="true"></div>
+        function renderDetail() {
+            const pattern = patternsData[activeTab][selectedPatternIndex];
+            
+            document.getElementById('detail-title').innerText = pattern.title;
+            document.getElementById('detail-definition').innerText = pattern.definition;
+            // Changed from innerText to innerHTML to render colors
+            document.getElementById('detail-structure').innerHTML = pattern.structure;
+            document.getElementById('detail-tip').innerText = pattern.tip;
+            // Changed from innerText to innerHTML to render colors
+            document.getElementById('detail-example').innerHTML = pattern.example;
+            
+            lucide.createIcons();
+        }
 
-          <!-- Relojes (arriba derecha, vertical) -->
-          <${WorldClocks} />
+        // --- NEW: SIDEBAR ACCORDION LOGIC ---
+        function toggleAccordion(element) {
+            const content = element.querySelector('.accordion-content');
+            const icon = element.querySelector('.accordion-icon');
+            const isOpened = content.classList.contains('grid-rows-[1fr]');
+            
+            // Close all others first (optional: creates true accordion behavior)
+            const allItems = document.querySelectorAll('#universal-list > li');
+            allItems.forEach(item => {
+                const itemContent = item.querySelector('.accordion-content');
+                const itemIcon = item.querySelector('.accordion-icon');
+                itemContent.classList.remove('grid-rows-[1fr]');
+                itemContent.classList.add('grid-rows-[0fr]');
+                itemIcon.classList.remove('rotate-180');
+            });
 
-          <!-- Subtle turbines -->
-          <div className="absolute inset-0 pointer-events-none opacity-25">
-            <${WindTurbine} className="absolute -left-24 bottom-0" scale=${1.1} delay=${0.0} />
-            <${WindTurbine} className="absolute left-1/4 bottom-0" scale=${0.7} delay=${2.0} />
-            <${WindTurbine} className="absolute right-1/4 bottom-0" scale=${0.85} delay=${4.0} />
-            <${WindTurbine} className="absolute -right-24 bottom-0" scale=${1.35} delay=${1.0} />
-          </div>
+            // Toggle current if it wasn't opened
+            if (!isOpened) {
+                content.classList.remove('grid-rows-[0fr]');
+                content.classList.add('grid-rows-[1fr]');
+                icon.classList.add('rotate-180');
+            }
+        }
 
-          <!-- Main content -->
-          <div className="relative z-10 w-full h-full flex items-center justify-center px-6">
-            <${motion.div}
-              initial=${{ opacity: 0, y: 18 }}
-              animate=${{ opacity: 1, y: 0 }}
-              transition=${{ duration: 0.7 }}
-              className="w-full max-w-5xl text-center"
-            >
-              <div className="flex flex-col items-center gap-8">
-                <${BrandHeader} />
+        // --- LOGIC FUNCTIONS ---
 
-                <!-- Badge (grande + punto rojo) -->
-                <div className="inline-flex items-center gap-4 px-8 py-3 rounded-full border border-white/20 bg-white/10 backdrop-blur-md">
-                  <span className="relative flex h-3.5 w-3.5">
-                    <span className="animate-ping absolute h-full w-full rounded-full bg-red-500/60"></span>
-                    <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-red-600"></span>
-                  </span>
-                  <span className="text-sm md:text-base font-extrabold tracking-[0.35em] text-white uppercase">
-                    ${current.badge}
-                  </span>
-                </div>
+        function switchTab(tabId) {
+            activeTab = tabId;
+            selectedPatternIndex = 0;
+            renderTabs();
+            renderSidebar();
+            renderDetail();
+        }
 
-                <!-- Title + desc (animated) -->
-                <div className="min-h-[240px] flex flex-col justify-center">
-                  <${AnimatePresence} mode="wait">
-                    <${motion.div}
-                      key=${idx}
-                      initial=${{ opacity: 0, y: 10, filter: "blur(8px)" }}
-                      animate=${{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                      exit=${{ opacity: 0, y: -10, filter: "blur(8px)" }}
-                      transition=${{ duration: 0.65 }}
-                    >
-                      <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6">
-                        ${words.map((w, i) => html`
-                          <span key=${i} className=${i >= lastTwoStart ? "gradient-text" : ""}>
-                            ${w}${" "}
-                            ${i === 1 ? html`<br className="hidden md:block" />` : null}
-                          </span>
-                        `)}
-                      </h1>
+        function selectPattern(index) {
+            selectedPatternIndex = index;
+            renderSidebar();
+            renderDetail();
+        }
 
-                      <p className="text-white/85 text-base md:text-lg lg:text-xl max-w-2xl mx-auto font-light leading-relaxed">
-                        ${current.desc}
-                      </p>
-                    </${motion.div}>
-                  </${AnimatePresence}>
-                </div>
+        function copyToClipboard() {
+            const pattern = patternsData[activeTab][selectedPatternIndex];
+            // Strip HTML tags for clipboard text
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = pattern.example;
+            const textToCopy = tempDiv.textContent || tempDiv.innerText || "";
+            const cleanText = textToCopy.replace(/^"|"$/g, '');
+            
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(cleanText).then(showToast);
+            } else {
+                const textArea = document.createElement("textarea");
+                textArea.value = cleanText;
+                textArea.style.position = "fixed";
+                textArea.style.left = "-9999px";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast();
+                } catch (err) {
+                    console.error('Unable to copy', err);
+                }
+                document.body.removeChild(textArea);
+            }
+        }
 
-                <!-- Progress (MISMA DISPOSICIÓN; solo cambia el comportamiento a lineal) -->
-                <div className="w-full max-w-sm mx-auto space-y-3 pt-2">
-                  <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest"
-                       style=${{ color: "#4298b5" }}>
-                    <${AnimatePresence} mode="wait">
-                      <${motion.span}
-                        key=${idx}
-                        initial=${{ opacity: 0 }}
-                        animate=${{ opacity: 1 }}
-                        exit=${{ opacity: 0 }}
-                      >
-                        ${current.status}
-                      </${motion.span}>
-                    </${AnimatePresence}>
-                    <span className="text-white">${progress.toFixed(1)}%</span>
-                  </div>
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2000);
+        }
 
-                  <div className="relative h-2 w-full bg-white/15 rounded-full overflow-hidden">
-                    <${motion.div}
-                      animate=${{ width: `${progress}%` }}
-                      transition=${{ duration: 0.12, ease: "linear" }}
-                      className="absolute inset-y-0 left-0"
-                      style=${{
-                        background: "linear-gradient(90deg, #4298b5, #ffffff)"
-                      }}
-                    ></${motion.div}>
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            renderTabs();
+            renderSidebar();
+            renderDetail();
+            lucide.createIcons();
+        };
 
-                    <${motion.div}
-                      animate=${{ x: ["-50%", "350%"] }}
-                      transition=${{ duration: 3.2, repeat: Infinity, ease: "linear" }}
-                      className="absolute inset-y-0 w-28 bg-white/20 blur-sm"
-                    ></${motion.div}>
-                  </div>
-
-
-                </div>
-              </div>
-            </${motion.div}>
-          </div>
-
-          <!-- Footer -->
-          <footer className="absolute bottom-8 left-0 right-0 z-10 flex flex-col items-center gap-3 px-6">
-            <div className="flex items-center gap-4 text-[10px] tracking-[0.45em] uppercase font-semibold text-white/60">
-              <span className="h-px w-10" style=${{ background: "rgba(66,152,181,0.45)" }}></span>
-              <span>Global Wind Excellence</span>
-              <span className="h-px w-10" style=${{ background: "rgba(66,152,181,0.45)" }}></span>
-            </div>
-            <p className="text-[10px] text-white/45 uppercase tracking-widest">
-              © Windar Renovables • Todos los derechos reservados
-            </p>
-          </footer>
-        </div>
-      `;
-    }
-
-    const container = document.getElementById("root");
-    if (container) {
-      const root = createRoot(container);
-      root.render(html`<${App} />`);
-    }
-  </script>
+    </script>
 </body>
 </html>
