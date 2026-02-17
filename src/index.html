@@ -1,17 +1,325 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css">
-  <title>Vanilla JavaScript App</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mantenimiento | Windar Renovables</title>
+
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --primary: #4298b5;
+      --black: #000000;
+      --white: #ffffff;
+    }
+
+    body{
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      overflow: hidden;
+      background: var(--black);
+      color: var(--white);
+    }
+
+    h1{ font-family: 'Outfit', sans-serif; }
+
+    .gradient-text{
+      background: linear-gradient(90deg, var(--primary), #ffffff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    #root{ width: 100vw; height: 100vh; }
+
+    .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+  </style>
 </head>
 
 <body>
-  <main>
-    <h1>Vanilla JavaScript App</h1>
-  </main>
-</body>
+  <div id="root"></div>
 
+  <script type="module">
+    import React, { useEffect, useMemo, useState } from "https://esm.sh/react@19.2.4";
+    import { createRoot } from "https://esm.sh/react-dom@19.2.4/client";
+    import { AnimatePresence, motion } from "https://esm.sh/framer-motion@12.29.2";
+    import htm from "https://esm.sh/htm@3.1.1";
+    const html = htm.bind(React.createElement);
+
+    // --- ASSETS ---
+    const BG_IMAGE = "https://windar-renovables.com/wp-content/uploads/2021/08/Ecosistemas_Windar-1-scaled.jpg";
+    const LOGO_IMAGE = "https://windar-renovables.com/wp-content/uploads/2021/07/cropped-Mesa-de-trabajo-1.png";
+
+    // --- TRANSLATIONS ---
+    const TRANSLATIONS = [
+      {
+        lang: "es",
+        badge: "EN MANTENIMIENTO",
+        title: "Trabajos en curso",
+        desc: "Estamos realizando mantenimiento preventivo para mejorar el rendimiento de nuestros servicios digitales. Volvemos en breve.",
+        status: "Sincronizando sistemas...",
+      },
+      {
+        lang: "en",
+        badge: "UNDER MAINTENANCE",
+        title: "Work in progress",
+        desc: "We are performing preventive maintenance to improve our digital services. We'll be back shortly.",
+        status: "Synchronizing systems...",
+      },
+    ];
+
+    // --- WIND TURBINE (subtil, en blanco) ---
+    const WindTurbine = ({ className = "", scale = 1, delay = 0 }) => html`
+      <div className=${`relative ${className}`} style=${{ transform: `scale(${scale})` }}>
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-2 h-48 bg-white/10 rounded-t-full"></div>
+        <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2">
+          <${motion.div}
+            animate=${{ rotate: 360 }}
+            transition=${{ duration: 12, repeat: Infinity, ease: "linear", delay }}
+            className="relative w-4 h-4 bg-white/20 rounded-full flex items-center justify-center"
+          >
+            ${[0, 120, 240].map((deg) => html`
+              <div
+                key=${deg}
+                className="absolute w-1 h-32 bg-gradient-to-t from-white/15 to-transparent rounded-full origin-bottom"
+                style=${{ transform: `rotate(${deg}deg) translateY(-100%)` }}
+              ></div>
+            `)}
+          </${motion.div}>
+        </div>
+      </div>
+    `;
+
+    // --- LOGO (IMG real) ---
+    const BrandHeader = () => html`
+      <div className="flex flex-col items-center gap-4">
+        <img
+          src=${LOGO_IMAGE}
+          alt="Windar Renovables"
+          className="h-14 md:h-16 w-auto drop-shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
+          loading="eager"
+          decoding="async"
+        />
+        <span className="sr-only">Windar Renovables</span>
+      </div>
+    `;
+
+    // --- RELOJES (arriba derecha, vertical, sin segundos) ---
+    const WorldClocks = () => {
+      const ZONES = [
+        { label: "España", tz: "Europe/Madrid" },
+        { label: "India", tz: "Asia/Kolkata" },
+        { label: "Brasil", tz: "America/Sao_Paulo" },
+        { label: "México", tz: "America/Mexico_City" },
+        { label: "Polonia", tz: "Europe/Warsaw" },
+      ];
+
+      const [now, setNow] = useState(new Date());
+
+      useEffect(() => {
+        const t = setInterval(() => setNow(new Date()), 15000); // cada 15s, suficiente sin segundos
+        return () => clearInterval(t);
+      }, []);
+
+      const fmtTime = (tz) =>
+        new Intl.DateTimeFormat("es-ES", {
+          timeZone: tz,
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        }).format(now);
+
+      return html`
+        <div className="absolute top-6 right-6 z-20 pointer-events-none">
+          <div className="rounded-2xl border border-white/15 bg-white/5 backdrop-blur-md p-3 md:p-4 w-[170px] md:w-[190px]">
+            <div className="text-[10px] md:text-[11px] font-extrabold uppercase tracking-[0.25em] text-white/80 mb-2">
+              Horas/Time
+            </div>
+
+            <div className="flex flex-col gap-2">
+              ${ZONES.map((z) => html`
+                <div key=${z.tz} className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/25 px-3 py-2">
+                  <div className="text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-white/65">
+                    ${z.label}
+                  </div>
+                  <div className="text-sm md:text-base font-extrabold text-white tabular-nums">
+                    ${fmtTime(z.tz)}
+                  </div>
+                </div>
+              `)}
+            </div>
+          </div>
+        </div>
+      `;
+    };
+
+    function App(){
+      const [idx, setIdx] = useState(0);
+
+      // ✅ PROGRESO LINEAL (no aleatorio), empieza en 70% y sube hasta 95%
+      const [progress, setProgress] = useState(70.0);
+
+      useEffect(() => {
+        const interval = setInterval(() => setIdx((p) => (p + 1) % TRANSLATIONS.length), 4500);
+        return () => clearInterval(interval);
+      }, []);
+
+      useEffect(() => {
+        const progInterval = setInterval(() => {
+          setProgress((p) => {
+            if (p >= 95.0) return 95.0;
+            // subida lineal suave: +0.05% cada 100ms => ~0.5%/s
+            const next = p + 0.05;
+            return next > 95.0 ? 95.0 : next;
+          });
+        }, 100);
+        return () => clearInterval(progInterval);
+      }, []);
+
+      const current = useMemo(() => TRANSLATIONS[idx], [idx]);
+      const words = current.title.split(" ");
+      const lastTwoStart = Math.max(0, words.length - 2);
+
+      return html`
+        <div className="relative w-full h-full overflow-hidden">
+          <!-- Background image -->
+          <div
+            className="absolute inset-0 bg-center bg-cover"
+            style=${{ backgroundImage: `url(${BG_IMAGE})` }}
+            aria-hidden="true"
+          ></div>
+
+          <!-- Dark overlay + primary tint -->
+          <div className="absolute inset-0 bg-black/70" aria-hidden="true"></div>
+          <div className="absolute inset-0" style=${{
+            background: "radial-gradient(80% 60% at 50% 30%, rgba(66,152,181,0.35), rgba(0,0,0,0) 60%)"
+          }} aria-hidden="true"></div>
+
+          <!-- Relojes (arriba derecha, vertical) -->
+          <${WorldClocks} />
+
+          <!-- Subtle turbines -->
+          <div className="absolute inset-0 pointer-events-none opacity-25">
+            <${WindTurbine} className="absolute -left-24 bottom-0" scale=${1.1} delay=${0.0} />
+            <${WindTurbine} className="absolute left-1/4 bottom-0" scale=${0.7} delay=${2.0} />
+            <${WindTurbine} className="absolute right-1/4 bottom-0" scale=${0.85} delay=${4.0} />
+            <${WindTurbine} className="absolute -right-24 bottom-0" scale=${1.35} delay=${1.0} />
+          </div>
+
+          <!-- Main content -->
+          <div className="relative z-10 w-full h-full flex items-center justify-center px-6">
+            <${motion.div}
+              initial=${{ opacity: 0, y: 18 }}
+              animate=${{ opacity: 1, y: 0 }}
+              transition=${{ duration: 0.7 }}
+              className="w-full max-w-5xl text-center"
+            >
+              <div className="flex flex-col items-center gap-8">
+                <${BrandHeader} />
+
+                <!-- Badge (grande + punto rojo) -->
+                <div className="inline-flex items-center gap-4 px-8 py-3 rounded-full border border-white/20 bg-white/10 backdrop-blur-md">
+                  <span className="relative flex h-3.5 w-3.5">
+                    <span className="animate-ping absolute h-full w-full rounded-full bg-red-500/60"></span>
+                    <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-red-600"></span>
+                  </span>
+                  <span className="text-sm md:text-base font-extrabold tracking-[0.35em] text-white uppercase">
+                    ${current.badge}
+                  </span>
+                </div>
+
+                <!-- Title + desc (animated) -->
+                <div className="min-h-[240px] flex flex-col justify-center">
+                  <${AnimatePresence} mode="wait">
+                    <${motion.div}
+                      key=${idx}
+                      initial=${{ opacity: 0, y: 10, filter: "blur(8px)" }}
+                      animate=${{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      exit=${{ opacity: 0, y: -10, filter: "blur(8px)" }}
+                      transition=${{ duration: 0.65 }}
+                    >
+                      <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6">
+                        ${words.map((w, i) => html`
+                          <span key=${i} className=${i >= lastTwoStart ? "gradient-text" : ""}>
+                            ${w}${" "}
+                            ${i === 1 ? html`<br className="hidden md:block" />` : null}
+                          </span>
+                        `)}
+                      </h1>
+
+                      <p className="text-white/85 text-base md:text-lg lg:text-xl max-w-2xl mx-auto font-light leading-relaxed">
+                        ${current.desc}
+                      </p>
+                    </${motion.div}>
+                  </${AnimatePresence}>
+                </div>
+
+                <!-- Progress (MISMA DISPOSICIÓN; solo cambia el comportamiento a lineal) -->
+                <div className="w-full max-w-sm mx-auto space-y-3 pt-2">
+                  <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest"
+                       style=${{ color: "#4298b5" }}>
+                    <${AnimatePresence} mode="wait">
+                      <${motion.span}
+                        key=${idx}
+                        initial=${{ opacity: 0 }}
+                        animate=${{ opacity: 1 }}
+                        exit=${{ opacity: 0 }}
+                      >
+                        ${current.status}
+                      </${motion.span}>
+                    </${AnimatePresence}>
+                    <span className="text-white">${progress.toFixed(1)}%</span>
+                  </div>
+
+                  <div className="relative h-2 w-full bg-white/15 rounded-full overflow-hidden">
+                    <${motion.div}
+                      animate=${{ width: `${progress}%` }}
+                      transition=${{ duration: 0.12, ease: "linear" }}
+                      className="absolute inset-y-0 left-0"
+                      style=${{
+                        background: "linear-gradient(90deg, #4298b5, #ffffff)"
+                      }}
+                    ></${motion.div}>
+
+                    <${motion.div}
+                      animate=${{ x: ["-50%", "350%"] }}
+                      transition=${{ duration: 3.2, repeat: Infinity, ease: "linear" }}
+                      className="absolute inset-y-0 w-28 bg-white/20 blur-sm"
+                    ></${motion.div}>
+                  </div>
+
+
+                </div>
+              </div>
+            </${motion.div}>
+          </div>
+
+          <!-- Footer -->
+          <footer className="absolute bottom-8 left-0 right-0 z-10 flex flex-col items-center gap-3 px-6">
+            <div className="flex items-center gap-4 text-[10px] tracking-[0.45em] uppercase font-semibold text-white/60">
+              <span className="h-px w-10" style=${{ background: "rgba(66,152,181,0.45)" }}></span>
+              <span>Global Wind Excellence</span>
+              <span className="h-px w-10" style=${{ background: "rgba(66,152,181,0.45)" }}></span>
+            </div>
+            <p className="text-[10px] text-white/45 uppercase tracking-widest">
+              © Windar Renovables • Todos los derechos reservados
+            </p>
+          </footer>
+        </div>
+      `;
+    }
+
+    const container = document.getElementById("root");
+    if (container) {
+      const root = createRoot(container);
+      root.render(html`<${App} />`);
+    }
+  </script>
+</body>
 </html>
